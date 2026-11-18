@@ -1,5 +1,6 @@
-// PowerPins -> Blynk Wi-Fi gateway (ESP32)
-// Receives compact lines from the Uno over Serial2 and forwards them to Blynk.
+// PowerPins -> cloud Wi-Fi gateway (ESP32)
+// Receives compact lines from the Uno over Serial2 and forwards them to
+// your own server (POST /api/report) and to Blynk.
 //
 // Uno sends (one per line):  M,45.3   moisture %
 //                            P,1/P,0   pump on/off
@@ -10,18 +11,43 @@
 //         Uno GND -> ESP32 GND
 
 // --- fill these in from blynk.cloud ---
-#define BLYNK_TEMPLATE_ID   "TMPxxxxxx"
+#define BLYNK_TEMPLATE_ID   "TMPL45a1f0KUC"
 #define BLYNK_TEMPLATE_NAME "PowerPins"
-#define BLYNK_AUTH_TOKEN    "your-auth-token"
+#define BLYNK_AUTH_TOKEN    "ywd-pJk9WUwEKaTKNdtivZF5rju_c_dc"
 // --------------------------------------
 
+// --- your own cloud server ---
+const char* API_HOST = "https://bd1.wild-lionfish.ts.net";  // Tailscale Funnel -> bd1:8080
+const char* API_KEY  = "e0de835334d82744bb27220dfff88414"; // same as API_KEY on the server
+// -------------------------------
+
 #include <WiFi.h>
+#include <WiFiClientSecure.h>
+#include <HTTPClient.h>
 #include <BlynkSimpleEsp32.h>
 
-char ssid[] = "YourWiFiName";     // 2.4 GHz network (ESP32 doesn't do 5 GHz)
-char pass[] = "YourWiFiPassword";
+char ssid[] = "B's A55";            // 2.4 GHz network (ESP32 doesn't do 5 GHz)
+char pass[] = "102030parola";
 
 String line;
+
+// forward one event to your server: POST {host}/api/report  {"c":"M","v":41.2}
+void postToServer(char code, float value) {
+  WiFiClientSecure client;
+  client.setInsecure();  // skip certificate check (fine for plant data)
+  HTTPClient http;
+  http.begin(client, String(API_HOST) + "/api/report");
+  http.addHeader("Content-Type", "application/json");
+  http.addHeader("Authorization", String("Bearer ") + API_KEY);
+  http.setTimeout(3000);
+  String body = String("{\"c\":\"") + code + "\",\"v\":" + String(value, 1) + "}";
+  int rc = http.POST(body);
+  if (rc != 200) {
+    Serial.print("server post failed: ");
+    Serial.println(rc);
+  }
+  http.end();
+}
 
 void handleLine(const String &l) {
   int comma = l.indexOf(',');
@@ -46,6 +72,8 @@ void handleLine(const String &l) {
       Blynk.logEvent("dry_warning");
       break;
   }
+  if (code == 'M' || code == 'P' || code == 'S' || code == 'W')
+    postToServer(code, value);
 }
 
 void setup() {
@@ -67,5 +95,3 @@ void loop() {
     }
   }
 }
-
-println("hello world")

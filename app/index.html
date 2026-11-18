@@ -33,10 +33,10 @@
 <details id="settings">
   <summary class="meta">Settings</summary>
   <div class="card">
-    <label>Blynk server</label>
-    <input id="server" placeholder="blynk.cloud (or e.g. fra1.blynk.cloud)">
-    <label>Device auth token</label>
-    <input id="token" placeholder="from blynk.cloud → Device Info">
+    <label>Server URL</label>
+    <input id="server" placeholder="http://your-vps-ip:8080">
+    <label>API key</label>
+    <input id="token" placeholder="same as API_KEY on the server">
     <button id="save">Save &amp; connect</button>
     <div id="err"></div>
   </div>
@@ -72,7 +72,7 @@ if (cfg.token) $('settings').open = false;
 let timer = null;
 
 $('save').onclick = () => {
-  cfg.server = $('server').value.trim().replace(/^https?:\/\//, '').replace(/\/+$/, '');
+  cfg.server = $('server').value.trim().replace(/\/+$/, '');
   cfg.token  = $('token').value.trim();
   localStorage.setItem('powerpins', JSON.stringify(cfg));
   start();
@@ -81,13 +81,14 @@ $('save').onclick = () => {
 async function poll() {
   $('err').textContent = '';
   try {
-    // one request returns all datastreams as JSON
-    const r = await fetch(
-      `https://${cfg.server}/external/api/get?token=${encodeURIComponent(cfg.token)}&V0&V1&V2`);
+    const base = cfg.server || '';          // empty = same host as the page
+    const r = await fetch(`${base}/api/state`, {
+      headers: { Authorization: `Bearer ${cfg.token}` },
+    });
     if (!r.ok) throw new Error(`${r.status} ${await r.text()}`);
     const d = await r.json();
 
-    const m = typeof d.V0 === 'number' ? d.V0 : null;
+    const m = typeof d.moisture === 'number' ? d.moisture : null;
     if (m !== null) {
       $('m').textContent = m.toFixed(1);
       const bar = $('mbar');
@@ -95,22 +96,23 @@ async function poll() {
       bar.style.background = m < 30 ? '#ff453a' : m < 60 ? '#ffd60a' : '#4cd964';
     }
 
-    const on = d.V1 == 1;
+    const on = !!d.pumpOn;
     $('pump').classList.toggle('on', on);
     $('pumptext').textContent = 'Pump: ' + (on ? 'watering 💧' : 'idle');
 
-    const w = (d.V2 || '').toString();
+    const w = (d.warning || '').toString();
     $('warn').style.display = w ? 'block' : 'none';
     $('warntext').textContent = w;
 
-    $('ts').textContent = new Date().toLocaleTimeString();
+    $('ts').textContent = d.lastEventAt
+      ? new Date(d.lastEventAt).toLocaleTimeString() : 'never';
 
-    const h = await fetch(
-      `https://${cfg.server}/external/api/isHardwareConnected?token=${encodeURIComponent(cfg.token)}`);
-    $('online').textContent = (await h.text()) === 'true' ? 'online ✅' : 'offline ❌';
+    // device counts as online if it reported in the last 30 s
+    const age = d.lastEventAt ? (Date.now() - Date.parse(d.lastEventAt)) / 1000 : 1e9;
+    $('online').textContent = age < 30 ? 'online ✅' : 'offline ❌';
   } catch (e) {
     $('err').textContent = 'Error: ' + e.message +
-      '\n(offline browser/CORS issue? see README note)';
+      '\n(server unreachable or wrong API key?)';
     $('online').textContent = 'unknown';
   }
 }

@@ -1,0 +1,12 @@
+2026-11-17 10:53:01,719 - mcp.server.fastmcp.tools.tool_manager - WARNING - Tool already exists: list_available_models
+2026-11-17 10:53:01,724 - yolo_service - INFO - Starting YOLO MCP service
+2026-11-17 10:53:01,724 - yolo_service - INFO - Camera watchdog thread started
+2026-11-17 10:53:01,748 - mcp.server.lowlevel.server - INFO - Processing request of type ListToolsRequest
+2026-11-17 10:53:01,756 - mcp.server.lowlevel.server - INFO - Processing request of type ListResourcesRequest
+2026-11-17 10:53:01,758 - mcp.server.lowlevel.server - INFO - Processing request of type ListPromptsRequest
+2026-11-18 15:11:38,022 - mcp.server.fastmcp.tools.tool_manager - WARNING - Tool already exists: list_available_models
+2026-11-18 15:11:38,035 - yolo_service - INFO - Starting YOLO MCP service
+2026-11-18 15:11:38,036 - yolo_service - INFO - Camera watchdog thread started
+2026-11-18 15:11:38,061 - mcp.server.lowlevel.server - INFO - Processing request of type ListToolsRequest
+2026-11-18 15:11:38,076 - mcp.server.lowlevel.server - INFO - Processing request of type ListResourcesRequest
+2026-11-18 15:11:38,077 - mcp.server.lowlevel.server - INFO - Processing request of type ListPromptsRequest
