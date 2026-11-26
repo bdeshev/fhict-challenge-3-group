@@ -1,0 +1,31 @@
+{
+  "expo": {
+    "name": "Smart Plant Watering",
+    "slug": "plant-app",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "scheme": "plantapp",
+    "userInterfaceStyle": "automatic",
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.debis31313.plantapp"
+    },
+    "android": {
+      "package": "com.debis31313.plantapp",
+      "googleServicesFile": "./google-services.json"
+    },
+    "plugins": [
+      "expo-secure-store",
+      ["expo-notifications", { "defaultChannel": "alerts" }]
+    ],
+    "experiments": {
+      "typedRoutes": true
+    },
+    "extra": {
+      "eas": {
+        "projectId": "ee98e7ba-1d2c-4b53-a16b-2e7ca3981ed0"
+      }
+    },
+    "owner": "debis31313"
+  }
+}

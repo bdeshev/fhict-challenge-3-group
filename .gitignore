@@ -1,13 +1,13 @@
 # ---------- Secrets / environment ----------
 .env
 .env.*
+.kilo/
 !.env.example
 *.pem
 *.key
 appsettings.Development.json
 appsettings.Local.json
 secrets.json
-
 # ---------- Node / React ----------
 node_modules/
 dist/

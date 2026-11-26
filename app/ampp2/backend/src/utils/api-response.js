@@ -1,0 +1,18 @@
+function sendSuccess(res, data = {}, statusCode = 200) {
+  return res.status(statusCode).json({
+    success: true,
+    data: data && typeof data === 'object' ? data : { result: data }
+  });
+}
+
+function sendError(res, statusCode, message) {
+  return res.status(statusCode).json({
+    success: false,
+    message
+  });
+}
+
+module.exports = {
+  sendSuccess,
+  sendError
+};
