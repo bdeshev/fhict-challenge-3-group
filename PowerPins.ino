@@ -1,3 +1,25 @@
+// ---------------------------------------------------------------
+// PowerPins wiring overview
+//
+// Moisture sensor:
+//   sensor VCC   -> Uno 5V
+//   sensor GND   -> Uno GND
+//   sensor OUT   -> Uno A2 (analog, calibrated via dryValue/wetValue)
+//
+// Pump:
+//   Uno A1 -> pump driver (transistor/MOSFET/relay) -> pump motor
+//   pumpActiveHigh below decides whether the driver is active-HIGH
+//
+// Serial link to the ESP32 Wi-Fi gateway (9600 baud, one line per event):
+//   Uno pin 10 (TX) -> level shifter HV side
+//                     -> level shifter LV side -> ESP32 GPIO16 (RX2)
+//   Shifter power:  HV = Uno 5V, LV = ESP32 3V3, GND shared by both boards
+//   Uno GND -> ESP32 GND (common ground is required)
+//   Uno pin 11 (RX) and ESP32 GPIO17 (TX2) are unused
+//
+// Debugging: Uno USB serial at 9600 baud stays free for the monitor.
+// ESP32 side lives in ESP32Gateway/ESP32Gateway.ino.
+// ---------------------------------------------------------------
 #include <SoftwareSerial.h>
 
 const int sensorPin = A2;
