@@ -65,7 +65,7 @@
 <script>
 const $ = id => document.getElementById(id);
 const cfg = JSON.parse(localStorage.getItem('powerpins') || '{}');
-$('server').value = cfg.server || 'blynk.cloud';
+$('server').value = cfg.server || '';
 $('token').value  = cfg.token  || '';
 if (cfg.token) $('settings').open = false;
 
@@ -121,7 +121,7 @@ function start() {
   if (!cfg.token) { $('settings').open = true; return; }
   clearInterval(timer);
   poll();
-  timer = setInterval(poll, 5000);   // every 5 s; well within Blynk free limits
+  timer = setInterval(poll, 5000);   // every 5 s
 }
 start();
 </script>
